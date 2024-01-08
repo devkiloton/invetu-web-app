@@ -280,6 +280,11 @@ export const investmentsDataSlice = createSlice({
           cryptos: {
             ...state.cryptos,
             dataCryptos: action.payload,
+            asyncState: {
+              isLoading: false,
+              isLoaded: true,
+              error: null,
+            },
           },
         };
       },

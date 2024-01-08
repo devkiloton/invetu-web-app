@@ -14,7 +14,16 @@ export const useDeleteFixedIncome = () => {
       .firestore.investments.fixedIncomes.delete(auth.currentUser?.uid!, name)
       .then(() => {
         dispatch(deleteFixedIncome(name));
-        dispatch(deleteInvestmentResult({ id: name, type: 'fixedIncomes', invested: 0, result: 0, period: 'all', currency: 'BRL'}));
+        dispatch(
+          deleteInvestmentResult({
+            id: name,
+            type: 'fixedIncomes',
+            invested: 0,
+            result: 0,
+            period: 'all',
+            currency: 'BRL',
+          }),
+        );
 
         snackbar('Investimento removido com sucesso!');
       });

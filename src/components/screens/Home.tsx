@@ -61,7 +61,10 @@ export default function Home() {
     const response = Object.values(investmentsDataStore.stocks.stockData);
     setStocksHistory(response);
     // take the current price of each stock and multiply by the amount
-    const currentBalanceFromStocks = getCurrentBalanceFromManyStocks(stocks, response);
+    const currentBalanceFromStocks = getCurrentBalanceFromManyStocks(
+      stocks,
+      response,
+    );
     setCurrentStocksBalance(currentBalanceFromStocks);
   }, [investmentsDataStore]);
 
@@ -78,28 +81,13 @@ export default function Home() {
       switch (true) {
         case isStock(investment):
           const stock = investment as Stock;
-          return (
-            <StockCard
-              key={stock.ticker}
-              {...stock}
-            />
-          );
+          return <StockCard key={stock.ticker} {...stock} />;
         case isCrypto(investment):
           const crypto = investment as Crypto;
-          return (
-            <CryptoCard
-              key={crypto.ticker}
-              {...crypto}
-            />
-          );
+          return <CryptoCard key={crypto.ticker} {...crypto} />;
         default:
           const fixedIncome = investment as FixedIncome;
-          return (
-            <FixedIncomeCard
-              key={fixedIncome.name}
-              {...fixedIncome}
-            />
-          );
+          return <FixedIncomeCard key={fixedIncome.name} {...fixedIncome} />;
       }
     },
     [investmentsDataStore, investmentsStore, currentStocksBalance],
@@ -125,8 +113,8 @@ export default function Home() {
               </div>
             </div>
             <div
-              className="tooltip tooltip-error w-full z-0"
-              data-tip="Ops, funcionalidade em desenvolvimento">
+              className="tooltip tooltip-warning w-full z-0"
+              data-tip="Estamos desenvolvendo essa funcionalidade nesse exato momento">
               <div className="glassy-border rounded-2xl w-full p-4 md:p-8">
                 <h1 className="font-semibold mb-3 text-start">
                   Evolução patrimonial

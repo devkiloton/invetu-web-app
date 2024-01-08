@@ -1,7 +1,11 @@
 /* eslint-disable no-case-declarations */
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-export type InvestmentType = 'stocks' | 'cryptos' | 'fixedIncomes' | 'treasuries';
+export type InvestmentType =
+  | 'stocks'
+  | 'cryptos'
+  | 'fixedIncomes'
+  | 'treasuries';
 
 export type InvestmentResult = {
   id: string;
@@ -21,6 +25,7 @@ type InvestmentResults = {
   cryptos: Array<InvestmentResult>;
   treasuries: Array<InvestmentResult>;
   currentBalance: number;
+  resultMonth: number;
 };
 
 const initialState: InvestmentResults = {
@@ -29,6 +34,7 @@ const initialState: InvestmentResults = {
   treasuries: [],
   fixedIncomes: [],
   currentBalance: 0,
+  resultMonth: 0,
 };
 
 export const investmentsResultSlice = createSlice({
@@ -49,10 +55,13 @@ export const investmentsResultSlice = createSlice({
       }
 
       state.currentBalance += payload.result;
-          const removeIdFromTreasuries = state[payload.type].filter(
-            treasury => treasury.id !== payload.id,
-          );
-          state[payload.type] = [...removeIdFromTreasuries, payload];
+      const removeIdFromTreasuries = state[payload.type].filter(
+        treasury => treasury.id !== payload.id,
+      );
+      state[payload.type] = [...removeIdFromTreasuries, payload];
+    },
+    updateResultMonth: (state, action: PayloadAction<number>) => {
+      state.resultMonth = action.payload;
     },
     deleteInvestmentResult: (
       state,
@@ -64,14 +73,14 @@ export const investmentsResultSlice = createSlice({
       );
       if (!investmentResult) return;
       state.currentBalance -= investmentResult.result;
-          const removeIdFromStocks = state[payload.type].filter(
-            stock => stock.id !== payload.id,
-          );
-          state[payload.type] = [...removeIdFromStocks];
-      
+      const removeIdFromStocks = state[payload.type].filter(
+        stock => stock.id !== payload.id,
+      );
+      state[payload.type] = [...removeIdFromStocks];
     },
   },
 });
 
-export const { addInvestmentResult, deleteInvestmentResult } = investmentsResultSlice.actions;
+export const { addInvestmentResult, deleteInvestmentResult, updateResultMonth } =
+  investmentsResultSlice.actions;
 export const investmentsResultReducer = investmentsResultSlice.reducer;

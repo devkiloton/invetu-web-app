@@ -13,9 +13,7 @@ import useDeleteStock from '~/hooks/use-delete-stock';
 import { useUsLogos } from '~/hooks/use-us-logos';
 import useAddInvestmentResult from '~/hooks/use-add-investment-result';
 
-function StockCard(
-  props: Stock,
-) {
+function StockCard(props: Stock) {
   const [stockInfo, setStockInfo] = useState<Result | null>(null);
   const [chartData, setChartData] = useState<{
     dates: string[];
@@ -27,10 +25,10 @@ function StockCard(
   );
   const investmentsResultStore = useCustomSelector(
     state => state.investmentsResult,
-  )
+  );
   const deleteStock = useDeleteStock();
   const usLogos = useUsLogos();
-  const addInvestmentResult = useAddInvestmentResult()
+  const addInvestmentResult = useAddInvestmentResult();
 
   useEffect(() => {
     setStockInfo(
@@ -64,13 +62,16 @@ function StockCard(
         .slice(dates.length * -1)
         .map(price => price.close),
     });
-    addInvestmentResult({
-      id: props.ticker,
-      currency: 'BRL',
-      invested: props.price * props.amount,
-      result: results.regularMarketPrice * props.amount,
-      period: 'all',
-    },'stocks')
+    addInvestmentResult(
+      {
+        id: props.ticker,
+        currency: 'BRL',
+        invested: props.price * props.amount,
+        result: results.regularMarketPrice * props.amount,
+        period: 'all',
+      },
+      'stocks',
+    );
   }, [stockInfo]);
 
   const deleteSelectedStock = useCallback(() => {
@@ -172,7 +173,7 @@ function StockCard(
           <div className="card-actions">
             <div
               className="tooltip tooltip-error w-full z-0"
-              data-tip="Ops, funcionalidade em desenvolvimento">
+              data-tip="Essa funcionalidade ainda será desenvolvida">
               <button disabled className="btn btn-primary w-full">
                 Mais detalhes
               </button>

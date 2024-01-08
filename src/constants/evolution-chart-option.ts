@@ -1,6 +1,8 @@
 import { ApexOptions } from 'apexcharts';
 
-export const EVOLUTION_CHART_OPTIONS: ApexOptions = {
+export const EVOLUTION_CHART_OPTIONS = (
+  datesISO: Array<string>,
+): ApexOptions => ({
   chart: {
     height: 350,
     type: 'area',
@@ -16,6 +18,63 @@ export const EVOLUTION_CHART_OPTIONS: ApexOptions = {
       //     download: false,
       //   },
     },
+    locales: [
+      {
+        name: 'pt-BR',
+        options: {
+          months: [
+            'Janeiro',
+            'Fevereiro',
+            'Março',
+            'Abril',
+            'Maio',
+            'Junho',
+            'Julho',
+            'Agosto',
+            'Setembro',
+            'Outubro',
+            'Novembro',
+            'Dezemnbro',
+          ],
+          shortMonths: [
+            'Jan',
+            'Fev',
+            'Mar',
+            'Abr',
+            'Mai',
+            'Jun',
+            'Jul',
+            'Ago',
+            'Set',
+            'Out',
+            'Nov',
+            'Dez',
+          ],
+          days: [
+            'Domingo',
+            'Segunda',
+            'Terça',
+            'Quarta',
+            'Quinta',
+            'Sexta',
+            'Sábado',
+          ],
+          shortDays: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+          toolbar: {
+            exportToSVG: 'Baixar SVG',
+            exportToPNG: 'Baixar PNG',
+            exportToCSV: 'Baixar CSV',
+            selection: 'Seleção',
+            selectionZoom: 'Seleção de Zoom',
+            zoomIn: 'Zoom In',
+            zoomOut: 'Zoom Out',
+            pan: 'Panning',
+            reset: 'Resetar Zoom',
+          },
+        },
+      },
+    ],
+    defaultLocale: 'pt-BR',
   },
   dataLabels: {
     enabled: false,
@@ -35,15 +94,7 @@ export const EVOLUTION_CHART_OPTIONS: ApexOptions = {
     axisBorder: {
       color: 'transparent',
     },
-    categories: [
-      '2018-01-19T00:00:00.000Z',
-      '2018-02-19T01:30:00.000Z',
-      '2018-03-19T02:30:00.000Z',
-      '2018-04-19T03:30:00.000Z',
-      '2018-05-19T04:30:00.000Z',
-      '2018-06-19T05:30:00.000Z',
-      '2018-07-19T06:30:00.000Z',
-    ],
+    categories: datesISO,
     labels: {
       style: {
         cssClass: 'fill-base-content',
@@ -56,6 +107,11 @@ export const EVOLUTION_CHART_OPTIONS: ApexOptions = {
       style: {
         cssClass: 'fill-base-content',
       },
+      formatter: (value: number) =>
+        new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL',
+        }).format(value),
     },
   },
   tooltip: {
@@ -65,4 +121,4 @@ export const EVOLUTION_CHART_OPTIONS: ApexOptions = {
       format: 'dd/MM/yy',
     },
   },
-};
+});

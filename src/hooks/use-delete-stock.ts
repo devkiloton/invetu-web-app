@@ -19,7 +19,16 @@ function useDeleteStock() {
           .then(() => {
             dispatch(deleteStock(ticker));
             dispatch(deleteStockData(ticker));
-            dispatch(deleteInvestmentResult({ id: ticker, type: 'stocks', invested: 0, result: 0, period: 'all', currency: 'BRL'}));
+            dispatch(
+              deleteInvestmentResult({
+                id: ticker,
+                type: 'stocks',
+                invested: 0,
+                result: 0,
+                period: 'all',
+                currency: 'BRL',
+              }),
+            );
             tooltip('Ação removida com sucesso!');
           });
     },

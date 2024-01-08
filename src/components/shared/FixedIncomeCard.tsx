@@ -13,9 +13,7 @@ import { useDeleteFixedIncome } from '~/hooks/use-delete-fixed-income';
 import { getprofitIpca } from '~/helpers/get-profit-ipca';
 import useAddInvestmentResult from '~/hooks/use-add-investment-result';
 
-function FixedIncomeCard(
-  props: FixedIncome,
-) {
+function FixedIncomeCard(props: FixedIncome) {
   const fixedIncomeData = useCustomSelector(
     state => state.investmentsData.fixedIncomes,
   );
@@ -24,14 +22,14 @@ function FixedIncomeCard(
     prices: number[];
   } | null>(null);
   const [profit, setProfit] = useState(0);
-  const addInvestmentResult = useAddInvestmentResult()
+  const addInvestmentResult = useAddInvestmentResult();
 
   const investmentsDataStore = useCustomSelector(
     state => state.investmentsData.fixedIncomes,
   );
   const investmentsResultStore = useCustomSelector(
     state => state.investmentsResult,
-  )
+  );
   const deleteFixedIncome = useDeleteFixedIncome();
   useEffect(() => {
     switch (props.index) {
@@ -58,14 +56,17 @@ function FixedIncomeCard(
           props.rate,
         ).then(profit => {
           setProfit(profit);
+          addInvestmentResult(
+            {
+              id: props.name,
+              currency: 'BRL',
+              period: 'all',
+              invested: props.amount,
+              result: profit,
+            },
+            'fixedIncomes',
+          );
         });
-        addInvestmentResult({
-          id: props.name,
-          currency: 'BRL',
-          period: 'all',
-          invested: props.amount,
-          result: profit,
-        },'fixedIncomes')
         break;
       case FixedIncomeIndex.PRE:
         const dataPre = getProfitPre(
@@ -79,15 +80,18 @@ function FixedIncomeCard(
           dates: dataPre.dates.map(date => date.toISOString()),
           prices: dataPre.prices,
         });
-        addInvestmentResult({
-          id: props.name,
-          currency: 'BRL',
-          period: 'all',
-          invested: props.amount,
-          result: dataPre.totalProfit,
-        },'fixedIncomes')
+        addInvestmentResult(
+          {
+            id: props.name,
+            currency: 'BRL',
+            period: 'all',
+            invested: props.amount,
+            result: dataPre.totalProfit,
+          },
+          'fixedIncomes',
+        );
         break;
-      default:
+      case FixedIncomeIndex.IPCA:
         const ipcaHistory = fixedIncomeData.ipca;
         const dataIpca = getprofitIpca(
           new Date(props.startDate),
@@ -102,59 +106,64 @@ function FixedIncomeCard(
           dates: dataIpca.dates.map(date => date.toISOString()),
           prices: dataIpca.prices,
         });
+        addInvestmentResult(
+          {
+            id: props.name,
+            currency: 'BRL',
+            period: 'all',
+            invested: props.amount,
+            result: dataIpca.totalProfit,
+          },
+          'fixedIncomes',
+        );
         break;
     }
   }, [fixedIncomeData]);
 
   useEffect(() => {
     if (!investmentsDataStore.asyncState.isLoaded) return;
-    switch (props.index) {
-      case FixedIncomeIndex.CDI:
-        const data = investmentsDataStore.cdi.daily
-          .map(daily => {
-            return {
-              date: new Date(daily.data.split('/').reverse().join('-')),
-              value: Number(daily.valor),
-            };
-          })
-          .filter(
-            dailyFormatted =>
-              dailyFormatted.date.getTime() >
-                new Date(props.startDate).getTime() &&
-              dailyFormatted.date.getTime() <=
-                // Adding 24h to handle edge cases
-                new Date(props?.endDate ?? new Date()).getTime() +
-                  60000 * 60 * 24,
-          )
-          .map(finalValue => ({
-            date: finalValue.date.toISOString(),
-            value: Number(finalValue.value),
-          }));
-        const dates = data.map(daily => daily.date);
-        // Calculate the daily earnings using the daily taxes with reduce
-        const prices = data.reduce(
-          (acc, curr) => {
-            const lastValue = acc[acc.length - 1];
-            const newValue = lastValue * (1 + curr.value / 100);
-            return [...acc, newValue];
-          },
-          [props.amount],
-        );
-        setChartData({ dates, prices });
-        addInvestmentResult({
+    if (props.index === FixedIncomeIndex.CDI) {
+      const data = investmentsDataStore.cdi.daily
+        .map(daily => {
+          return {
+            date: new Date(daily.data.split('/').reverse().join('-')),
+            value: Number(daily.valor),
+          };
+        })
+        .filter(
+          dailyFormatted =>
+            dailyFormatted.date.getTime() >
+              new Date(props.startDate).getTime() &&
+            dailyFormatted.date.getTime() <=
+              // Adding 24h to handle edge cases
+              new Date(props?.endDate ?? new Date()).getTime() +
+                60000 * 60 * 24,
+        )
+        .map(finalValue => ({
+          date: finalValue.date.toISOString(),
+          value: Number(finalValue.value),
+        }));
+      const dates = data.map(daily => daily.date);
+      // Calculate the daily earnings using the daily taxes with reduce
+      const prices = data.reduce(
+        (acc, curr) => {
+          const lastValue = acc[acc.length - 1];
+          const newValue = lastValue * (1 + curr.value / 100);
+          return [...acc, newValue];
+        },
+        [props.amount],
+      );
+      setChartData({ dates, prices });
+      addInvestmentResult(
+        {
           id: props.name,
           currency: 'BRL',
           period: 'all',
           invested: props.amount,
           result: prices[prices.length - 1],
-        },'fixedIncomes')
-        break;
-      case FixedIncomeIndex.PRE:
-        // Already solved in the useEffect above
-        break;
-      default:
-        // Already solved in the useEffect above
-        break;
+        },
+        'fixedIncomes',
+      );
     }
   }, [investmentsDataStore]);
 
@@ -215,7 +224,9 @@ function FixedIncomeCard(
               {new Intl.NumberFormat('pt-BR', {
                 style: 'percent',
                 maximumFractionDigits: 2,
-              }).format((props.amount * profit) / investmentsResultStore.currentBalance)}
+              }).format(
+                (props.amount * profit) / investmentsResultStore.currentBalance,
+              )}
             </span>
             <span className="text-sm  font-semibold">
               <span className="text-xs font-normal">Balanço: </span>
@@ -239,7 +250,7 @@ function FixedIncomeCard(
         <div className="card-actions">
           <div
             className="tooltip tooltip-error w-full z-0"
-            data-tip="Ops, funcionalidade em desenvolvimento">
+            data-tip="Essa funcionalidade ainda será desenvolvida">
             <button disabled className="btn btn-primary w-full">
               Mais detalhes
             </button>
