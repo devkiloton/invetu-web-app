@@ -1,4 +1,4 @@
-import { useCustomSelector } from "~/hooks/use-custom-selector";
+import { useCustomSelector } from '~/hooks/use-custom-selector';
 
 export default function AccountStats(props: {
   investedAmount: number;
@@ -33,7 +33,9 @@ export default function AccountStats(props: {
             %{' '}
             {(props.investedAmount === 0
               ? 0
-              : (investmentsResult.currentBalance / props.investedAmount) * 100 - 100
+              : (investmentsResult.currentBalance / props.investedAmount) *
+                  100 -
+                100
             ).toFixed(2)}
           </div>
         </div>

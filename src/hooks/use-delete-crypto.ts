@@ -22,7 +22,16 @@ function useDeleteCrypto() {
         .then(() => {
           dispatch(deleteCrypto(ticker));
           dispatch(deleteCryptoData(ticker));
-          dispatch(deleteInvestmentResult({ id: ticker, type: 'cryptos', invested: 0, result: 0, period: 'all', currency: 'BRL'}));
+          dispatch(
+            deleteInvestmentResult({
+              id: ticker,
+              type: 'cryptos',
+              invested: 0,
+              result: 0,
+              period: 'all',
+              currency: 'BRL',
+            }),
+          );
           tooltip('Criptomoeda removida com sucesso!');
         });
     },

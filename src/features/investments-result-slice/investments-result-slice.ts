@@ -1,7 +1,11 @@
 /* eslint-disable no-case-declarations */
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-export type InvestmentType = 'stocks' | 'cryptos' | 'fixedIncomes' | 'treasuries';
+export type InvestmentType =
+  | 'stocks'
+  | 'cryptos'
+  | 'fixedIncomes'
+  | 'treasuries';
 
 export type InvestmentResult = {
   id: string;
@@ -49,10 +53,10 @@ export const investmentsResultSlice = createSlice({
       }
 
       state.currentBalance += payload.result;
-          const removeIdFromTreasuries = state[payload.type].filter(
-            treasury => treasury.id !== payload.id,
-          );
-          state[payload.type] = [...removeIdFromTreasuries, payload];
+      const removeIdFromTreasuries = state[payload.type].filter(
+        treasury => treasury.id !== payload.id,
+      );
+      state[payload.type] = [...removeIdFromTreasuries, payload];
     },
     deleteInvestmentResult: (
       state,
@@ -64,14 +68,14 @@ export const investmentsResultSlice = createSlice({
       );
       if (!investmentResult) return;
       state.currentBalance -= investmentResult.result;
-          const removeIdFromStocks = state[payload.type].filter(
-            stock => stock.id !== payload.id,
-          );
-          state[payload.type] = [...removeIdFromStocks];
-      
+      const removeIdFromStocks = state[payload.type].filter(
+        stock => stock.id !== payload.id,
+      );
+      state[payload.type] = [...removeIdFromStocks];
     },
   },
 });
 
-export const { addInvestmentResult, deleteInvestmentResult } = investmentsResultSlice.actions;
+export const { addInvestmentResult, deleteInvestmentResult } =
+  investmentsResultSlice.actions;
 export const investmentsResultReducer = investmentsResultSlice.reducer;

@@ -8,7 +8,6 @@ import {
   Stock,
 } from '~/clients/firebase-client/models/Investments';
 import { joinStockData } from '~/helpers/join-stock-data';
-import { Dialog } from '@headlessui/react';
 import { Head } from '../shared/Head';
 import EvolutionChart from '../shared/EvolutionChart';
 import { useCustomSelector } from '~/hooks/use-custom-selector';
@@ -16,7 +15,6 @@ import Ghost from '~/assets/illustrations/ghost.svg';
 import Add from '~/assets/illustrations/add.svg';
 import WrapperIcon from '../shared/WrapperIcon';
 import { getCurrentBalanceFromManyStocks } from '~/helpers/get-current-balance-from-many-stocks';
-import AddInvestmentsForm from '../forms/AddInvestmentsForm';
 import { isStock } from '~/type-guards/is-stock';
 import { isCrypto } from '~/type-guards/is-crypto';
 import StockCard from '../shared/StockCard';
@@ -26,6 +24,7 @@ import { Result } from '~/clients/firebase-client/models/history-stock-br';
 import { joinCryptoData } from '~/helpers/join-crypto-data';
 import FixedIncomeCard from '../shared/FixedIncomeCard';
 import RadialChart from '../shared/RadialChart';
+import AddInvestmentDialog from '../shared/AddInvestmentDialog';
 
 type SupportedInvestments = Stock | FixedIncome | Crypto;
 
@@ -61,7 +60,10 @@ export default function Home() {
     const response = Object.values(investmentsDataStore.stocks.stockData);
     setStocksHistory(response);
     // take the current price of each stock and multiply by the amount
-    const currentBalanceFromStocks = getCurrentBalanceFromManyStocks(stocks, response);
+    const currentBalanceFromStocks = getCurrentBalanceFromManyStocks(
+      stocks,
+      response,
+    );
     setCurrentStocksBalance(currentBalanceFromStocks);
   }, [investmentsDataStore]);
 
@@ -78,32 +80,21 @@ export default function Home() {
       switch (true) {
         case isStock(investment):
           const stock = investment as Stock;
-          return (
-            <StockCard
-              key={stock.ticker}
-              {...stock}
-            />
-          );
+          return <StockCard key={stock.ticker} {...stock} />;
         case isCrypto(investment):
           const crypto = investment as Crypto;
-          return (
-            <CryptoCard
-              key={crypto.ticker}
-              {...crypto}
-            />
-          );
+          return <CryptoCard key={crypto.ticker} {...crypto} />;
         default:
           const fixedIncome = investment as FixedIncome;
-          return (
-            <FixedIncomeCard
-              key={fixedIncome.name}
-              {...fixedIncome}
-            />
-          );
+          return <FixedIncomeCard key={fixedIncome.name} {...fixedIncome} />;
       }
     },
     [investmentsDataStore, investmentsStore, currentStocksBalance],
   );
+
+  const setStateDialogAddInvestment = useCallback((state: boolean) => {
+    setIsOpen(state);
+  }, []);
 
   return (
     <>
@@ -155,9 +146,6 @@ export default function Home() {
           </div>
         </div>
         <div className="flex gap-x-4">
-          <div className="w-full h-full sticky top-24 max-w-120 hidden min-[1024px]:block ">
-            <AddInvestmentsForm />
-          </div>
           <div className="w-full flex flex-col gap-4">
             {investmentsJoined.length === 0 && (
               <div className="flex h-full justify-center items-center flex-col gap-4">
@@ -178,7 +166,7 @@ export default function Home() {
         </div>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="btn btn-primary btn-circle fixed bottom-5 right-5 ">
+          className="btn btn-primary btn-circle fixed bottom-5 right-5 min-[768px]:hidden">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-6 w-6 rotate-45"
@@ -193,17 +181,10 @@ export default function Home() {
             />
           </svg>
         </button>
-        <Dialog
-          open={isOpen}
-          onClose={() => setIsOpen(false)}
-          className="relative z-[100]">
-          <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-          <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-            <Dialog.Panel className="max-w-120 w-full overflow-scroll max-h-[90vh]">
-              <AddInvestmentsForm />
-            </Dialog.Panel>
-          </div>
-        </Dialog>
+        <AddInvestmentDialog
+          isOpen={isOpen}
+          setIsOpen={setStateDialogAddInvestment}
+        />
       </PageContainer>
     </>
   );
