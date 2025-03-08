@@ -15,6 +15,7 @@ const SignInWithEmailLink = () => {
     const actionCodeSettings = {
       url: 'https://app.invetu.com/home',
       handleCodeInApp: true,
+      linkDomain: 'app.invetu.com'
     };
     sendSignInLinkToEmail(auth, email, actionCodeSettings).then(() => {
       window.localStorage.setItem('emailForSignIn', email);
